@@ -59,8 +59,13 @@ module.exports = {
         )
       }
       if (ext === 'audio/mpeg')
-        req.body.message.image = response.secure_url
-      else req.body.message.audio = response.secure_url
+        req.body.message.image = response?.secure_url
+      if (
+        ext === 'image/jpeg' ||
+        ext === 'image/png' ||
+        ext === 'image/jpg'
+      )
+        req.body.message.audio = response?.secure_url
 
       await Message.create(req.body)
       res.status(201).json({ message: 'message sent' })
