@@ -8,18 +8,24 @@ const buffer = require('../helpers/bufferConversion')
 module.exports = {
   getMessagesInConversation: async (req, res) => {
     try {
-      const { roomId } = req.params
+      const sender = req.user.id
+      const { receiver } = req.query
 
-      const messages = await Message.find({ roomId })
+      console.log('s', sender, 'r', receiver)
+      const room = await Chatroom.findOne({
+        people: {
+          $all: [sender, receiver],
+        },
+      })
+
+      if (!room) throw Error('start chat')
+      const messages = await Message.find({ roomId: room._id })
         .select('-roomId -_id -createdAt -updatedAt -__v')
         .populate('sender', '-password', User)
         .populate('receiver', '-password')
-      if (!messages.length)
-        return res
-          .status(404)
-          .json({ messages: 'start conversation' })
+      if (!messages.length) throw Error('start conversation')
 
-      res.status(200).json({ messages, message: 'Fetched' })
+      res.status(200).json({ messages })
     } catch (e) {
       res
         .status(e?.statusCode || 400)
@@ -29,10 +35,13 @@ module.exports = {
 
   sendMessage: async (req, res) => {
     try {
-      const { sender, receiver } = req.body
+      const sender = req.user.id
+      const { receiver, text } = req.body
+
+      let obj = { text }
       const ext = req?.file?.mimetype
       let resource, response
-
+      console.log(req.file)
       let chatroom
       chatroom = await Chatroom.findOne({
         people: {
@@ -44,14 +53,13 @@ module.exports = {
         chatroom = await Chatroom.create({
           people: [sender, receiver],
         })
-      req.body.roomId = chatroom._id
+
       //checks for audio or image
 
       if (ext === 'audio/mpeg') resource = 'video'
       else resource = 'image'
       if (ext) {
         response = await cloudinary(
-          filename,
           buffer(req?.file?.originalname, req?.file?.buffer),
           {
             resource_type: resource,
@@ -59,15 +67,21 @@ module.exports = {
         )
       }
       if (ext === 'audio/mpeg')
-        req.body.message.image = response?.secure_url
+        obj = { ...obj, audio: response?.secure_url }
       if (
         ext === 'image/jpeg' ||
         ext === 'image/png' ||
         ext === 'image/jpg'
       )
-        req.body.message.audio = response?.secure_url
+        obj = { ...obj, image: response?.secure_url }
 
-      await Message.create(req.body)
+      // return console.log(obj)
+      await Message.create({
+        sender,
+        receiver,
+        roomId: chatroom._id,
+        message: obj,
+      })
       res.status(201).json({ message: 'message sent' })
     } catch (e) {
       res

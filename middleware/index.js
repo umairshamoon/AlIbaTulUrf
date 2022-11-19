@@ -3,6 +3,7 @@ const { JWT_SECRET } = require('../config')
 module.exports = {
   isLogin: function (req, res, next) {
     const token = req.header('authorization')
+
     if (!token)
       return res
         .status(401)
@@ -13,6 +14,7 @@ module.exports = {
       req.user = decoded
       next()
     } catch (error) {
+      console.log(error)
       res.status(400).json({ message: 'invalid token' })
     }
   },
