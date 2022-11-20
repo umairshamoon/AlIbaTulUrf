@@ -2,6 +2,7 @@ const Joi = require('joi')
 module.exports = function (product) {
   const productSchema = Joi.object({
     color: Joi.string().required(),
+    name: Joi.string().required(),
     pearls: Joi.boolean().default(false),
     scarf: Joi.boolean().default(false),
     length: Joi.number().min(1).required(),

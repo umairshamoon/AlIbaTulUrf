@@ -1,6 +1,7 @@
 const { Schema, model } = require('mongoose')
 const schema = new Schema({
   color: { type: String, required: true },
+  name: { type: String, required: true },
   pearls: { type: Boolean, default: false },
   scarf: { type: Boolean, required: false },
   length: { type: Number, required: true },
