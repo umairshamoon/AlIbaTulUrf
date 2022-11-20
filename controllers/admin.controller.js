@@ -30,6 +30,7 @@ module.exports = {
           username: admin.username,
           email: admin.email,
           avatar: admin.avatar,
+          contact: admin.contact,
         },
       })
     } catch (error) {
