@@ -12,7 +12,7 @@ module.exports = {
     try {
       joiHelper(validateProduct, req.body)
 
-      if (!req?.file?.mimitype)
+      if (!req?.file?.mimetype)
         throw Error('please upload abaya image')
 
       const { secure_url } = await cloudinary(
