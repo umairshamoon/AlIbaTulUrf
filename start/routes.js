@@ -16,6 +16,7 @@ module.exports = function (app, express) {
     next(error)
   })
   app.use((error, req, res, next) => {
+    console.log(error)
     res.status(error.status || 500).json({
       message: error.message,
     })

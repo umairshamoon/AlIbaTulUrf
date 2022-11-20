@@ -8,7 +8,7 @@ const { isLogin } = require('../middleware')
 router.post(
   '/send',
   isLogin,
-  upload.single('image') || upload.single('audio'),
+  upload.single('image'),
   message.sendMessage
 )
 router.get('/chat', isLogin, message.getMessagesInConversation)

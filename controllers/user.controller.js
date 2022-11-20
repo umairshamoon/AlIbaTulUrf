@@ -17,10 +17,11 @@ module.exports = {
       const { password, email } = req.body
       joiHelper(validateLogin, req.body)
       const user = await User.findOne({ email })
+      console.log(user.password)
       if (!user) throw Error('incorrect email')
-      // if (!(await bcrypt.compare(password, user.password))) {
-      //   throw Error('incorrect password')
-      // }
+      if (!bcrypt.compare(password, user.password)) {
+        throw Error('incorrect password')
+      }
 
       res.status(200).json({
         message: 'Login successfully',
@@ -41,17 +42,18 @@ module.exports = {
     try {
       const { password, email } = req.body
       joiHelper(validateUser, req.body)
-      if (!req?.file?.mimetype)
-        throw Error('please upload profile image')
+      // if (!req?.file?.mimetype)
+      //   throw Error('please upload profile image')
 
       const user = await User.findOne({ email })
       if (user) {
         throw Error('user already exists')
       }
-      const { secure_url } = await cloudinary(
-        buffer(req?.file?.originalname, req?.file?.buffer)
-      )
-      req.body.avatar = secure_url
+      // const { secure_url } = await cloudinary(
+      //   buffer(req?.file?.originalname, req?.file?.buffer)
+      // )
+      req.body.avatar = 'secure_url'
+      const salt = await bcrypt
       req.body.password = await bcrypt.hash(password, 10)
       await User.create(req.body)
       res.status(201).json({ message: 'Account created' })

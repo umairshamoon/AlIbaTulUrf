@@ -21,8 +21,8 @@ module.exports = {
       if (!room) throw Error('start chat')
       const messages = await Message.find({ roomId: room._id })
         .select('-roomId -_id -createdAt -updatedAt -__v')
-        .populate('sender', '-password', User)
-        .populate('receiver', '-password')
+        .populate('sender receiver', '-password', User)
+
       if (!messages.length) throw Error('start conversation')
 
       res.status(200).json({ messages })
