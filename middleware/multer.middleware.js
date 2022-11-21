@@ -1,8 +1,9 @@
 let multer = require('multer')
-const upload = multer({
+
+module.exports = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 1024 * 1024 * 500,
+    fieldSize: 1024 * 1024 * 500,
   },
   fileFilter: function (req, file, done) {
     if (
@@ -11,16 +12,11 @@ const upload = multer({
       file.mimetype === 'image/jpg' ||
       file.mimetype === 'audio/aac'
     ) {
-      console.log(file)
       done(null, true)
     } else {
-      console.log(file)
-      console.log('yaha error')
-      var newError = new Error('please select an image')
-      newError.name = 'MulterError'
-      done(newError, false)
+      done(new Error('please select an image'), false)
     }
   },
 })
 
-module.exports = upload
+// module.exports = upload

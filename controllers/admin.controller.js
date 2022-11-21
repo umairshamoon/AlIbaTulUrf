@@ -1,7 +1,7 @@
 //npm
 const bcrypt = require('bcryptjs')
 //models
-const Admin = require('../models/user.model')
+const User = require('../models/user.model')
 //validatoins
 const validateLogin = require('../validations/login.validation')
 //helpers
@@ -13,7 +13,7 @@ module.exports = {
     try {
       const { password, email } = req.body
       joiHelper(validateLogin, req.body)
-      const admin = await Admin.findOne({ email })
+      const admin = await User.findOne({ email })
       if (!admin) throw Error('invalid email')
       if (admin?.role !== 'admin')
         return res
@@ -37,8 +37,10 @@ module.exports = {
       res.status(400).json({ message: error.message })
     }
   },
-  addProduct: async (req, res) => {
+
+  deleteUser: async (req, res) => {
     try {
+      await User.findByIdAndDelete(req.params.id)
     } catch (error) {
       res.status(400).json({ message: error.message })
     }

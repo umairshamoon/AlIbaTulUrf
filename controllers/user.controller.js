@@ -9,7 +9,7 @@ const validateUser = require('../validations/userRegister.validate')
 const joiHelper = require('../helpers/joi.helper')
 const jwtSign = require('../helpers/jwtSign.helper')
 const cloudinary = require('../helpers/cloudinary')
-const buffer = require('../helpers/bufferConversion')
+const bufferConversion = require('../helpers/bufferConversion')
 
 module.exports = {
   login: async (req, res) => {
@@ -37,23 +37,22 @@ module.exports = {
       res.status(400).json({ message: error.message })
     }
   },
-
   register: async (req, res) => {
     try {
       const { password, email } = req.body
+      const { originalname, buffer } = req.file
       joiHelper(validateUser, req.body)
-      // if (!req?.file?.mimetype)
-      //   throw Error('please upload profile image')
 
+      if (!originalname)
+        throw Error('please upload profile image')
       const user = await User.findOne({ email })
       if (user) {
         throw Error('user already exists')
       }
-      // const { secure_url } = await cloudinary(
-      //   buffer(req?.file?.originalname, req?.file?.buffer)
-      // )
-      req.body.avatar = 'secure_url'
-      const salt = await bcrypt
+      const { secure_url } = await cloudinary(
+        bufferConversion(originalname, buffer)
+      )
+      req.body.avatar = secure_url
       req.body.password = await bcrypt.hash(password, 10)
       await User.create(req.body)
       res.status(201).json({ message: 'Account created' })
@@ -63,8 +62,41 @@ module.exports = {
       })
     }
   },
-  order: async (req, res) => {
+  editProfile: async (req, res) => {
     try {
+      joiHelper(validateUser, req.body)
+
+      await User.findByIdAndUpdate(
+        req.user.id,
+        { $set: req.body },
+        { new: true },
+        (err, doc, raw) => {
+          if (err) console.log(err)
+          res.status(200).json(doc)
+        }
+      )
+    } catch (error) {
+      res.status(400).json({ message: error.message })
+    }
+  },
+  editProfilePic: async (req, res) => {
+    try {
+      const { originalname, buffer } = req.file
+      if (!originalname) throw Error('Please select a picture')
+      const { secure_url } = await cloudinary(
+        bufferConversion(originalname, buffer)
+      )
+      res.status(200).json(
+        await User.findByIdAndUpdate(
+          req.user.id,
+          { $set: { avatar: secure_url } },
+          { new: true },
+          (err, doc, raw) => {
+            if (err) console.log(err)
+            console.log(doc)
+          }
+        )
+      )
     } catch (error) {
       res.status(400).json({ message: error.message })
     }

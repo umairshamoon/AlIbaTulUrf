@@ -9,5 +9,6 @@ const schema = new Schema({
   discription: { type: String, required: true },
   price: { type: Number, required: true },
   image: { type: String, required: true },
+  postedBy: { type: Schema.Types.ObjectId, ref: 'user' },
 })
 module.exports = model('product', schema)
