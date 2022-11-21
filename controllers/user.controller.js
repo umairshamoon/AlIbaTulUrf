@@ -5,6 +5,7 @@ const User = require('../models/user.model')
 //validatoins
 const validateLogin = require('../validations/login.validation')
 const validateUser = require('../validations/userRegister.validate')
+const validateEditProfile = require('../validations/editProfile.validate')
 //helpers
 const joiHelper = require('../helpers/joi.helper')
 const jwtSign = require('../helpers/jwtSign.helper')
@@ -17,7 +18,6 @@ module.exports = {
       const { password, email } = req.body
       joiHelper(validateLogin, req.body)
       const user = await User.findOne({ email })
-      console.log(user.password)
       if (!user) throw Error('incorrect email')
       if (!bcrypt.compare(password, user.password)) {
         throw Error('incorrect password')
@@ -64,17 +64,14 @@ module.exports = {
   },
   editProfile: async (req, res) => {
     try {
-      joiHelper(validateUser, req.body)
-
-      await User.findByIdAndUpdate(
+      joiHelper(validateEditProfile, req.body)
+      const doc = await User.findByIdAndUpdate(
         req.user.id,
         { $set: req.body },
-        { new: true },
-        (err, doc, raw) => {
-          if (err) console.log(err)
-          res.status(200).json(doc)
-        }
+        { new: true }
       )
+      if (!doc) throw Error('something went wrong')
+      res.status(200).json({ message: 'Profile Updated' })
     } catch (error) {
       res.status(400).json({ message: error.message })
     }
@@ -86,17 +83,14 @@ module.exports = {
       const { secure_url } = await cloudinary(
         bufferConversion(originalname, buffer)
       )
-      res.status(200).json(
-        await User.findByIdAndUpdate(
-          req.user.id,
-          { $set: { avatar: secure_url } },
-          { new: true },
-          (err, doc, raw) => {
-            if (err) console.log(err)
-            console.log(doc)
-          }
-        )
+
+      const doc = await User.findByIdAndUpdate(
+        req.user.id,
+        { $set: { avatar: secure_url } },
+        { new: true }
       )
+      if (!doc) throw Error('something went wrong')
+      res.status(200).json({ message: 'Picture Updated' })
     } catch (error) {
       res.status(400).json({ message: error.message })
     }

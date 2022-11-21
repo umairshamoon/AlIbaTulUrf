@@ -27,7 +27,10 @@ module.exports = {
   },
   fetch: async (req, res) => {
     try {
-      const products = await Product.find({})
+      const products = await Product.find({}).populate(
+        'postedBy',
+        'username avatar contact _id'
+      )
       if (!products.length) throw Error('no abaya available')
       res.status(200).json(products)
     } catch (error) {

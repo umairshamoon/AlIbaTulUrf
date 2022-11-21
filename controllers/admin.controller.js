@@ -20,7 +20,7 @@ module.exports = {
           .status(403)
           .json({ message: 'access denaied' })
 
-      if (!(await bcrypt.compare(password, admin.password)))
+      if (!bcrypt.compare(password, admin.password))
         throw Error('incorrect password')
 
       res.status(200).json({
