@@ -1,5 +1,4 @@
-const express = require('express')
-const router = express.Router()
+const router = require('express').Router()
 const user = require('../controllers/user.controller')
 const upload = require('../middleware/multer.middleware')
 const { isLogin, isAdmin } = require('../middleware')

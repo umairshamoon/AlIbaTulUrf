@@ -3,7 +3,7 @@ const schema = new Schema({
   abayas: [
     {
       details: { type: Schema.Types.ObjectId, ref: 'product' },
-      quantity: { type: Number, required: tyre },
+      quantity: { type: Number, required: true },
     },
   ],
   customer: { type: Schema.Types.ObjectId, ref: 'user' },
