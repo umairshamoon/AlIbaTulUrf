@@ -12,5 +12,6 @@ const schema = new Schema({
     default: 'pending',
   },
   customer: { type: Schema.Types.ObjectId, ref: 'user' },
+  message: { type: String, default: 'default message' },
 })
 module.exports = model('order', schema)
