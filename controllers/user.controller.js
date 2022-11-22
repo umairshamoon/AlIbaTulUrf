@@ -26,11 +26,11 @@ module.exports = {
       res.status(200).json({
         message: 'Login successfully',
         token: jwtSign({ id: user.id }),
-
         user: {
           username: user.username,
           email: user.email,
           avatar: user.avatar,
+          contact: user.contact,
         },
       })
     } catch (error) {

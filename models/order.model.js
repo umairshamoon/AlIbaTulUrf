@@ -6,6 +6,11 @@ const schema = new Schema({
       quantity: { type: Number, required: true },
     },
   ],
+  status: {
+    type: String,
+    enum: ['pending', 'rejected', 'approved'],
+    default: 'pending',
+  },
   customer: { type: Schema.Types.ObjectId, ref: 'user' },
 })
-module.exports = model('cart', schema)
+module.exports = model('order', schema)
