@@ -8,7 +8,6 @@ const cloudinary = require('../helpers/cloudinary')
 const validateProduct = require('../validations/product.validation')
 module.exports = {
   add: (req, res) => {
-    // return console.log(req.body)
     Order.create({
       abayas: req.body.cart,
       customer: req.user.id,
@@ -57,7 +56,6 @@ module.exports = {
   },
   customOrder: async (req, res) => {
     try {
-      // return console.log(req.body)
       const {
         discription,
         name,
@@ -76,7 +74,9 @@ module.exports = {
           buffer(req?.file?.originalname, req?.file?.buffer)
         )
         req.body.image = secure_url
-      } else req.body.image = 'NA'
+      } else
+        req.body.image =
+          'https://cdn1.vectorstock.com/i/1000x1000/58/05/no-image-icon-available-picture-symbol-vector-35475805.jpg'
       req.body.postedBy = id
       const { _id } = await Product.create({
         discription,
@@ -120,13 +120,11 @@ module.exports = {
   fetchRespondedOrders: async (req, res) => {
     try {
       const { status } = req.query
-      console.log(req.query)
-      console.log(req.params)
 
       const orders = await Order.find({ status })
         .populate('customer', '-password -__v -role')
         .populate('abayas.details', '-_id -__v')
-      console.log(orders)
+
       if (!orders.length) throw Error('no custom orders')
       res.status(200).json(orders)
     } catch (error) {

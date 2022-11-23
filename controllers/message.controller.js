@@ -10,8 +10,6 @@ module.exports = {
     try {
       const sender = req.user.id
       const { receiver } = req.query
-
-      console.log('s', sender, 'r', receiver)
       const room = await Chatroom.findOne({
         people: {
           $all: [sender, receiver],
@@ -38,7 +36,6 @@ module.exports = {
           },
         }
       })
-      console.log(response)
       res.status(200).json({ response })
     } catch (e) {
       res
@@ -51,7 +48,6 @@ module.exports = {
     try {
       const sender = req.user.id
       const { text, messageTime = new Date() } = req.body
-      // return console.log(req.body)
       const { receiver } = req.query
       let obj = { text, messageTime }
       const ext = req?.file?.mimetype
@@ -88,8 +84,6 @@ module.exports = {
         ext === 'image/jpg'
       )
         obj = { ...obj, image: response?.secure_url }
-
-      // return console.log(obj)
       await Message.create({
         sender,
         receiver,
