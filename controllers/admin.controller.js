@@ -12,6 +12,7 @@ module.exports = {
   login: async (req, res) => {
     try {
       const { password, email } = req.body
+      console.log(req.body)
       joiHelper(validateLogin, req.body)
       const admin = await User.findOne({ email })
       if (!admin) throw Error('invalid email')
@@ -31,6 +32,7 @@ module.exports = {
           email: admin.email,
           avatar: admin.avatar,
           contact: admin.contact,
+          id: admin._id,
         },
       })
     } catch (error) {

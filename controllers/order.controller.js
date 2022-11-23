@@ -8,9 +8,11 @@ const cloudinary = require('../helpers/cloudinary')
 const validateProduct = require('../validations/product.validation')
 module.exports = {
   add: (req, res) => {
+    // return console.log(req.body)
     Order.create({
-      abayas: req.body,
+      abayas: req.body.cart,
       customer: req.user.id,
+      shipping_address: req.body.address,
     })
       .then((r) =>
         res
@@ -22,10 +24,11 @@ module.exports = {
       )
   },
   get: (req, res) => {
-    let query = {}
-    if (!req.user.isAdmin) query = { customer: req.user.id }
+    let query = { order_type: 'shop' }
+    if (!req.user.isAdmin)
+      query = { ...query, customer: req.user.id }
     Order.find(query)
-      .populate('customer', '-password -_id -__v -role')
+      .populate('customer', '-password -__v -role')
       .populate('abayas.details', '-_id -__v')
       .then((orders) => {
         if (!orders.length) throw Error('no order available')
@@ -37,7 +40,8 @@ module.exports = {
   },
   respondOrder: async (req, res) => {
     try {
-      const { response, message } = req.body
+      const { response, message = 'sorry' } = req.body
+
       const { orderId } = req.params
       if (!message)
         throw Error('Please enter your response message')
@@ -53,9 +57,20 @@ module.exports = {
   },
   customOrder: async (req, res) => {
     try {
-      req.body.price = 5
+      // return console.log(req.body)
+      const {
+        discription,
+        name,
+        color,
+        pearls,
+        scarf,
+        address,
+        length,
+        width,
+        quantity,
+      } = req.body
       const { id } = req.user
-      joiHelper(validateProduct, req.body)
+      // joiHelper(validateProduct, req.body)
       if (req.file) {
         const { secure_url } = await cloudinary(
           buffer(req?.file?.originalname, req?.file?.buffer)
@@ -63,14 +78,57 @@ module.exports = {
         req.body.image = secure_url
       } else req.body.image = 'NA'
       req.body.postedBy = id
-      const { _id } = await Product.create(req.body)
+      const { _id } = await Product.create({
+        discription,
+        name,
+        color,
+        pearls,
+        scarf,
+        image: 'NA',
+        price: 1,
+        shipping_address: address,
+        length,
+        width,
+      })
       await Order.create({
-        abayas: [_id],
+        abayas: [{ details: _id, quantity }],
         customer: id,
+        shipping_address: address,
+        order_type: 'custom',
       })
       res
         .status(201)
         .json({ message: 'your Order has been placed' })
+    } catch (error) {
+      res.status(400).json({ message: error.message })
+    }
+  },
+  fetchCustom: async (req, res) => {
+    try {
+      const orders = await Order.find({
+        order_type: 'custom',
+        status: 'pending',
+      })
+        .populate('customer', '-password -__v -role')
+        .populate('abayas.details', '-_id -__v')
+      if (!orders.length) throw Error('no custom orders')
+      res.status(200).json(orders)
+    } catch (error) {
+      res.status(400).json({ message: error.message })
+    }
+  },
+  fetchRespondedOrders: async (req, res) => {
+    try {
+      const { status } = req.query
+      console.log(req.query)
+      console.log(req.params)
+
+      const orders = await Order.find({ status })
+        .populate('customer', '-password -__v -role')
+        .populate('abayas.details', '-_id -__v')
+      console.log(orders)
+      if (!orders.length) throw Error('no custom orders')
+      res.status(200).json(orders)
     } catch (error) {
       res.status(400).json({ message: error.message })
     }

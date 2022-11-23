@@ -20,12 +20,26 @@ module.exports = {
 
       if (!room) throw Error('start chat')
       const messages = await Message.find({ roomId: room._id })
-        .select('-roomId -_id -createdAt -updatedAt -__v')
+        .select('-roomId -createdAt -updatedAt -__v')
         .populate('sender receiver', '-password', User)
+        .sort({ messageTime: -1 })
 
       if (!messages.length) throw Error('start conversation')
-
-      res.status(200).json({ messages })
+      const response = messages.map((m) => {
+        return {
+          _id: m._id,
+          text: m.message.text,
+          image: m.message.image,
+          createdAt: m.messageTime,
+          user: {
+            _id: m.sender._id,
+            name: m.sender.username,
+            avatar: m.sender.avatar,
+          },
+        }
+      })
+      console.log(response)
+      res.status(200).json({ response })
     } catch (e) {
       res
         .status(e?.statusCode || 400)
@@ -36,12 +50,12 @@ module.exports = {
   sendMessage: async (req, res) => {
     try {
       const sender = req.user.id
-      const { receiver, text } = req.body
-
-      let obj = { text }
+      const { text, messageTime = new Date() } = req.body
+      // return console.log(req.body)
+      const { receiver } = req.query
+      let obj = { text, messageTime }
       const ext = req?.file?.mimetype
       let resource, response
-      console.log(req.file)
       let chatroom
       chatroom = await Chatroom.findOne({
         people: {
@@ -81,6 +95,7 @@ module.exports = {
         receiver,
         roomId: chatroom._id,
         message: obj,
+        messageTime,
       })
       res.status(201).json({ message: 'message sent' })
     } catch (e) {

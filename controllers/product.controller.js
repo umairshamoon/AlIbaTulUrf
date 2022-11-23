@@ -19,6 +19,7 @@ module.exports = {
         buffer(req?.file?.originalname, req?.file?.buffer)
       )
       req.body.image = secure_url
+      req.body.postedBy = req.user.id
       await Product.create(req.body)
       res.status(201).json({ message: 'abaya added' })
     } catch (error) {
@@ -27,10 +28,10 @@ module.exports = {
   },
   fetch: async (req, res) => {
     try {
-      const products = await Product.find({}).populate(
-        'postedBy',
-        'username avatar contact _id'
-      )
+      const products = await Product.find({
+        postedBy: '637ba11a33e57efa49de3dfb',
+      }).populate('postedBy', 'username avatar contact _id')
+      console.log(products)
       if (!products.length) throw Error('no abaya available')
       res.status(200).json(products)
     } catch (error) {

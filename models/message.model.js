@@ -15,6 +15,6 @@ module.exports = model(
     },
     sender: { type: Schema.Types.ObjectId },
     receiver: { type: Schema.Types.ObjectId },
-    messageTime: { type: Date, default: Date.now() },
+    messageTime: { type: Date, default: new Date() },
   })
 )
