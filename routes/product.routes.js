@@ -13,6 +13,7 @@ router.post(
 )
 router.get('/fetch', isLogin, product.fetch)
 router.get('/fetch/:productId', isLogin, product.fetchOne)
+router.get('/query', isLogin, product.fetchQuery)
 router.delete(
   '/delete/:productId',
   isLogin,

@@ -31,7 +31,6 @@ module.exports = {
       const products = await Product.find({
         postedBy: '637ba11a33e57efa49de3dfb',
       }).populate('postedBy', 'username avatar contact _id')
-      console.log(products)
       if (!products.length) throw Error('no abaya available')
       res.status(200).json(products)
     } catch (error) {
@@ -58,6 +57,19 @@ module.exports = {
         .json({ message: 'abaya deleted successfully' })
     } catch (error) {
       res.status(400).json({ message: error.message })
+    }
+  },
+  fetchQuery: async (req, res) => {
+    try {
+      console.log('asdlkj')
+      console.log(req.query)
+
+      const products = await Product.find(req.query)
+      if (!products.length)
+        throw Error('no data against query exists')
+      res.status(200).json(products)
+    } catch (error) {
+      res.status(404).json({ message: error.message })
     }
   },
 }

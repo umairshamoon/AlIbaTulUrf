@@ -31,6 +31,7 @@ module.exports = {
           email: user.email,
           avatar: user.avatar,
           contact: user.contact,
+          address: user.address,
           id: user._id,
         },
       })

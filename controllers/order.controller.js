@@ -1,26 +1,28 @@
 const Order = require('../models/order.model')
 const Product = require('../models/product.model')
+const User = require('../models/user.model')
 // helpers
-const joiHelper = require('../helpers/joi.helper')
+
 const buffer = require('../helpers/bufferConversion')
 const cloudinary = require('../helpers/cloudinary')
-// valiations
-const validateProduct = require('../validations/product.validation')
+
 module.exports = {
-  add: (req, res) => {
-    Order.create({
-      abayas: req.body.cart,
-      customer: req.user.id,
-      shipping_address: req.body.address,
-    })
-      .then((r) =>
-        res
-          .status(201)
-          .json({ message: 'your Order has been placed' })
-      )
-      .catch((err) =>
-        res.status(400).json({ message: err.message })
-      )
+  add: async (req, res) => {
+    try {
+      await Order.create({
+        abayas: req.body.cart,
+        customer: req.user.id,
+        shipping_address: req.body.address,
+      })
+      const user = await User.findById(req.user.id)
+      user.orderPlaced = true
+      await user.save()
+      res
+        .status(201)
+        .json({ message: 'your Order has been placed' })
+    } catch (error) {
+      res.status(400).json({ message: error.message })
+    }
   },
   get: (req, res) => {
     let query = { order_type: 'shop' }
@@ -49,7 +51,7 @@ module.exports = {
       if (response) order.status = 'approved'
       else order.status = 'rejected'
       await order.save()
-      res.status(200).json({ message: 'Order updated' })
+      res.status(200).json({ message: `Order ${order.status}` })
     } catch (error) {
       res.status(400).json({ message: error.message })
     }
@@ -125,7 +127,7 @@ module.exports = {
         .populate('customer', '-password -__v -role')
         .populate('abayas.details', '-_id -__v')
 
-      if (!orders.length) throw Error('no custom orders')
+      if (!orders.length) throw Error(`no ${status} orders`)
       res.status(200).json(orders)
     } catch (error) {
       res.status(400).json({ message: error.message })

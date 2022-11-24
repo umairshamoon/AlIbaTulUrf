@@ -46,4 +46,15 @@ module.exports = {
       res.status(400).json({ message: error.message })
     }
   },
+  fetchCustomers: async (req, res) => {
+    try {
+      const users = await User.find({
+        orderPlaced: true,
+      }).select('_id username avatar address')
+      if (!users.length) throw Error('No Customers Available')
+      res.status(200).json(users)
+    } catch (error) {
+      res.status(400).json({ message: error.message })
+    }
+  },
 }
