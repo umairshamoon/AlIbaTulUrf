@@ -19,7 +19,7 @@ module.exports = {
       joiHelper(validateLogin, req.body)
       const user = await User.findOne({ email })
       if (!user) throw Error('incorrect email')
-      if (!bcrypt.compare(password, user.password)) {
+      if (!(await bcrypt.compare(password, user.password))) {
         throw Error('incorrect password')
       }
 
