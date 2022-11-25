@@ -19,6 +19,9 @@ module.exports = {
         return res
           .status(403)
           .json({ message: 'access denaied' })
+      // const temp = await bcrypt.hash(password, 10)
+      // console.log(temp)
+      // return res.json(temp)
 
       if (!(await bcrypt.compare(password, admin.password)))
         throw Error('incorrect password')

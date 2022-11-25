@@ -19,9 +19,8 @@ module.exports = {
       joiHelper(validateLogin, req.body)
       const user = await User.findOne({ email })
       if (!user) throw Error('incorrect email')
-      if (!(await bcrypt.compare(password, user.password))) {
+      if (!(await bcrypt.compare(password, user.password)))
         throw Error('incorrect password')
-      }
 
       res.status(200).json({
         message: 'Login successfully',
@@ -55,7 +54,8 @@ module.exports = {
         bufferConversion(originalname, buffer)
       )
       req.body.avatar = secure_url
-      req.body.password = await bcrypt.hash(password, 10)
+      const temp = await bcrypt.hash(password, 10)
+      req.body.password = temp
       await User.create(req.body)
       res.status(201).json({ message: 'Account created' })
     } catch (error) {
