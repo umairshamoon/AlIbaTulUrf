@@ -2,6 +2,12 @@ const router = require('express').Router()
 const admin = require('../controllers/admin.controller')
 const { isLogin, isAdmin } = require('../middleware')
 router.post('/login', admin.login)
+router.put(
+  '/upate/product/:productId',
+  isLogin,
+  isAdmin,
+  admin.upadteProduct
+)
 router.get(
   '/fetch/customers',
   isLogin,

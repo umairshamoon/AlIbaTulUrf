@@ -16,6 +16,7 @@ module.exports = {
   login: async (req, res) => {
     try {
       const { password, email } = req.body
+      console.log(req.body)
       joiHelper(validateLogin, req.body)
       const user = await User.findOne({ email })
       if (!user) throw Error('incorrect email')
@@ -43,7 +44,6 @@ module.exports = {
       const { password, email } = req.body
       const { originalname, buffer } = req.file
       joiHelper(validateUser, req.body)
-
       if (!originalname)
         throw Error('please upload profile image')
       const user = await User.findOne({ email })
@@ -54,8 +54,7 @@ module.exports = {
         bufferConversion(originalname, buffer)
       )
       req.body.avatar = secure_url
-      const temp = await bcrypt.hash(password, 10)
-      req.body.password = temp
+      req.body.password = await bcrypt.hash(password, 10)
       await User.create(req.body)
       res.status(201).json({ message: 'Account created' })
     } catch (error) {

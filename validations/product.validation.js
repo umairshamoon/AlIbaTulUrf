@@ -8,6 +8,7 @@ module.exports = function (product) {
     length: Joi.number().min(1).required(),
     width: Joi.number().min(1).required(),
     price: Joi.number().min(1).required(),
+    stock: Joi.number().min(1).required(),
     discription: Joi.string().required(),
   })
   return productSchema.validate(product)

@@ -29,7 +29,7 @@ module.exports = {
   fetch: async (req, res) => {
     try {
       const products = await Product.find({
-        postedBy: '637ba11a33e57efa49de3dfb',
+        postedBy: '6384b49266bc45f42ae52370',
       }).populate('postedBy', 'username avatar contact _id')
       if (!products.length) throw Error('no abaya available')
       res.status(200).json(products)
@@ -61,9 +61,6 @@ module.exports = {
   },
   fetchQuery: async (req, res) => {
     try {
-      console.log('asdlkj')
-      console.log(req.query)
-
       const products = await Product.find(req.query)
       if (!products.length)
         throw Error('no data against query exists')

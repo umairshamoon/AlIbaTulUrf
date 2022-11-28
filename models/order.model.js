@@ -4,6 +4,8 @@ const schema = new Schema({
     {
       details: { type: Schema.Types.ObjectId, ref: 'product' },
       quantity: { type: Number, required: true },
+      width: { type: Number, required: true },
+      length: { type: Number, required: true },
     },
   ],
   status: {

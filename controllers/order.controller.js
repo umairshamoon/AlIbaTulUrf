@@ -9,10 +9,17 @@ const cloudinary = require('../helpers/cloudinary')
 module.exports = {
   add: async (req, res) => {
     try {
+      const { cart } = req.body
       await Order.create({
-        abayas: req.body.cart,
+        abayas: cart,
         customer: req.user.id,
         shipping_address: req.body.address,
+      })
+
+      cart.map(async (c) => {
+        await Product.findByIdAndUpdate(c.details, {
+          $inc: { stock: -c.quantity },
+        })
       })
       const user = await User.findById(req.user.id)
       user.orderPlaced = true
