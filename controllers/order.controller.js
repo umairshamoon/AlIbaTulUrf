@@ -56,7 +56,14 @@ module.exports = {
       const order = await Order.findById(orderId)
       order.message = message
       if (response) order.status = 'approved'
-      else order.status = 'rejected'
+      else {
+        order.status = 'rejected'
+        order.abayas.map(async (a) => {
+          await Product.findByIdAndUpdate(a.details, {
+            $inc: { stock: a.quantity },
+          })
+        })
+      }
       await order.save()
       res.status(200).json({ message: `Order ${order.status}` })
     } catch (error) {
