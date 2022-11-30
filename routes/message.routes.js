@@ -6,8 +6,8 @@ const upload = require('../middleware/multer.middleware')
 const { isLogin } = require('../middleware')
 router.post(
   '/send',
-  // isLogin,
-  upload.single('image'),
+  isLogin,
+  upload.single('file'),
   message.sendMessage
 )
 router.get('/chat', isLogin, message.getMessagesInConversation)

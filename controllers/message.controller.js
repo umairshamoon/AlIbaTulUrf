@@ -4,7 +4,7 @@ const User = require('../models/user.model')
 
 //helper
 const cloudinary = require('../helpers/cloudinary')
-const buffer = require('../helpers/bufferConversion')
+const bufferConversion = require('../helpers/bufferConversion')
 module.exports = {
   getMessagesInConversation: async (req, res) => {
     try {
@@ -50,7 +50,6 @@ module.exports = {
       const { text, messageTime = new Date() } = req.body
       const { receiver } = req.query
       let obj = { text, messageTime }
-      const ext = req?.file?.mimetype
       let resource, response
       let chatroom
       chatroom = await Chatroom.findOne({
@@ -65,25 +64,26 @@ module.exports = {
         })
 
       //checks for audio or image
+      if (req.file) {
+        const { mimetype, buffer, originalname } = req.file
+        if (mimetype) {
+          if (mimetype === 'audio/aac') resource = 'video'
+          else resource = 'image'
 
-      if (ext === 'audio/aac') resource = 'video'
-      else resource = 'image'
-      if (ext) {
-        response = await cloudinary(
-          buffer(req?.file?.originalname, req?.file?.buffer),
-          {
-            resource_type: resource,
-          }
-        )
+          response = await cloudinary(
+            bufferConversion(originalname, buffer),
+            { resource_type: resource }
+          )
+          if (mimetype === 'audio/aac')
+            obj = { ...obj, audio: response?.secure_url }
+          if (
+            mimetype === 'image/jpeg' ||
+            mimetype === 'image/png' ||
+            mimetype === 'image/jpg'
+          )
+            obj = { ...obj, image: response?.secure_url }
+        }
       }
-      if (ext === 'audio/aac')
-        obj = { ...obj, audio: response?.secure_url }
-      if (
-        ext === 'image/jpeg' ||
-        ext === 'image/png' ||
-        ext === 'image/jpg'
-      )
-        obj = { ...obj, image: response?.secure_url }
       await Message.create({
         sender,
         receiver,
