@@ -66,7 +66,7 @@ module.exports = {
 
       //checks for audio or image
 
-      if (ext === 'audio/mpeg') resource = 'video'
+      if (ext === 'audio/aac') resource = 'video'
       else resource = 'image'
       if (ext) {
         response = await cloudinary(
@@ -76,7 +76,7 @@ module.exports = {
           }
         )
       }
-      if (ext === 'audio/mpeg')
+      if (ext === 'audio/aac')
         obj = { ...obj, audio: response?.secure_url }
       if (
         ext === 'image/jpeg' ||
@@ -93,6 +93,7 @@ module.exports = {
       })
       res.status(201).json({ message: 'message sent' })
     } catch (e) {
+      console.log('error ==> ', e)
       res
         .status(e?.statusCode || 400)
         .send({ message: e?.message })

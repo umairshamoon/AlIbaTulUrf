@@ -12,7 +12,9 @@ module.exports = multer({
       file.mimetype === 'image/jpg' ||
       file.mimetype === 'audio/aac'
     ) {
+      console.log('enters')
       done(null, true)
+      console.log('done')
     } else {
       done(new Error('please select an image'), false)
     }

@@ -6,7 +6,7 @@ const upload = require('../middleware/multer.middleware')
 const { isLogin } = require('../middleware')
 router.post(
   '/send',
-  isLogin,
+  // isLogin,
   upload.single('image'),
   message.sendMessage
 )
