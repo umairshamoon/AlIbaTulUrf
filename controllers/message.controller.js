@@ -24,10 +24,33 @@ module.exports = {
 
       if (!messages.length) throw Error('start conversation')
       const response = messages.map((m) => {
+        if (m.message.image != null)
+          return {
+            _id: m._id,
+            text: m.message.text,
+            image: m.message.image,
+            createdAt: m.messageTime,
+            user: {
+              _id: m.sender._id,
+              name: m.sender.username,
+              avatar: m.sender.avatar,
+            },
+          }
+        if (m.message.audio != null)
+          return {
+            _id: m._id,
+            text: m.message.text,
+            audio: m.message.audio,
+            createdAt: m.messageTime,
+            user: {
+              _id: m.sender._id,
+              name: m.sender.username,
+              avatar: m.sender.avatar,
+            },
+          }
         return {
           _id: m._id,
           text: m.message.text,
-          image: m.message.image,
           createdAt: m.messageTime,
           user: {
             _id: m.sender._id,
