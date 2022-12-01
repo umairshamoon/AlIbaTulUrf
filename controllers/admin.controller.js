@@ -57,6 +57,7 @@ module.exports = {
     }
   },
   upadteProduct: async (req, res) => {
+    console.log(req.body)
     try {
       const product = await Product.findById(
         req.params.productId

@@ -3,7 +3,7 @@ const admin = require('../controllers/admin.controller')
 const { isLogin, isAdmin } = require('../middleware')
 router.post('/login', admin.login)
 router.put(
-  '/upate/product/:productId',
+  '/update/product/:productId',
   isLogin,
   isAdmin,
   admin.upadteProduct
